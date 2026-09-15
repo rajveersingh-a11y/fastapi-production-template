@@ -24,7 +24,7 @@ RUN uv sync --frozen
 
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app /opt/uv-cache
 USER appuser
 
 # Health check
