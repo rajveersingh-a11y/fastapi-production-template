@@ -58,16 +58,15 @@ jobs:
 
       - name: Run integration tests
         if: steps.gate.outputs.enabled == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          @if [ -z "$$DATABASE_URL" ]; then \
-            echo "Skipping integration tests: DATABASE_URL is not set."; \
-          else \
-            uv run pytest tests/ -v -m integration --cov=app --cov-report=term; \
-            rc=$$?; \
-            if [ $$rc -eq 5 ]; then \
-              echo "No integration tests collected; treating as success."; \
-              exit 0; \
-            else \
-              exit $$rc; \
-            fi; \
+          set +e
+          uv run pytest tests/ -v -m integration --cov=app --cov-report=term
+          rc=$?
+          set -e
+          if [ $rc -eq 5 ]; then
+            echo "No integration tests collected; treating as success."
+            exit 0
           fi
+          exit $rc
